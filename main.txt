@@ -1,0 +1,61 @@
+package main
+
+import (
+	"fmt"
+	"github.com/otiai10/gosseract/v2"
+	"log"
+	"os"
+	"strings"
+	"time"
+)
+
+func main() {
+	t1 := time.Now()
+	client := gosseract.NewClient()
+	defer client.Close()
+	//client.SetLanguage("chi_sim")
+
+	file, err := os.Create("output3.txt")
+	if err != nil {
+		t2 := time.Now()
+		t3 := t2.Sub(t1)
+		fmt.Println("time spend: ", t3)
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	i := 1
+	var text string
+	for {
+		fileName := fmt.Sprintf("source/output_%03d.png", i)
+		// 设置需要识别的图片路径
+		err = client.SetImage(fileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// 识别文本
+		text, err = client.Text()
+		if err != nil {
+			fmt.Println("Error:", err)
+			return
+		}
+
+		file.WriteString(fmt.Sprintf("I: %v\n", i))
+		arr := strings.Split(text, "\n")
+		for _, v := range arr {
+			file.WriteString(fmt.Sprintf("%v\n", v))
+		}
+		file.WriteString("\n")
+		file.WriteString("\n")
+		i++
+	}
+}
+
+func execOCR() {
+
+}
+
+func makeCSV() {
+
+}
